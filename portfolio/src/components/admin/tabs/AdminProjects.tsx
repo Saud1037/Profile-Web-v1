@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Field, Input, Textarea, SaveBtn, DeleteBtn, SectionCard } from '../FormFields'
 import type { Project } from '@/types'
+
 interface Props {
   projects: Project[]
   showToast: (msg: string, type?: 'success' | 'error') => void
@@ -13,8 +14,8 @@ interface Props {
 function newProject(): Project {
   return {
     id: Math.random().toString(36).slice(2),
-    name: 'مشروع جديد',
-    description: 'وصف المشروع',
+    name: 'New Project',
+    description: 'Project description',
     tags: [],
     link: '#',
     emoji: '📦',
@@ -28,14 +29,13 @@ export function AdminProjects({ projects: initial, showToast, onSaved }: Props) 
   const [projects, setProjects] = useState<Project[]>(initial)
   const [loading, setLoading] = useState<string | null>(null)
 
-  const update = (id: string, key: keyof Project, value: unknown) => {
+  const update = (id: string, key: keyof Project, value: unknown) =>
     setProjects(prev => prev.map(p => p.id === id ? { ...p, [key]: value } : p))
-  }
 
   const add = () => setProjects(prev => [...prev, newProject()])
 
   const remove = async (id: string) => {
-    if (!confirm('هل تريد حذف هذا المشروع؟')) return
+    if (!confirm('Delete this project?')) return
     setLoading(id)
     try {
       const res = await fetch('/api/projects', {
@@ -45,16 +45,11 @@ export function AdminProjects({ projects: initial, showToast, onSaved }: Props) 
       })
       if (res.ok) {
         setProjects(prev => prev.filter(p => p.id !== id))
-        showToast('تم حذف المشروع')
+        showToast('Project deleted')
         onSaved()
-      } else {
-        showToast('فشل الحذف', 'error')
-      }
-    } catch {
-      showToast('خطأ في الاتصال', 'error')
-    } finally {
-      setLoading(null)
-    }
+      } else showToast('Delete failed', 'error')
+    } catch { showToast('Connection error', 'error') }
+    finally { setLoading(null) }
   }
 
   const save = async (project: Project) => {
@@ -65,30 +60,23 @@ export function AdminProjects({ projects: initial, showToast, onSaved }: Props) 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(project),
       })
-      if (res.ok) {
-        showToast(`تم حفظ "${project.name}" ✓`)
-        onSaved()
-      } else {
-        showToast('فشل الحفظ', 'error')
-      }
-    } catch {
-      showToast('خطأ في الاتصال', 'error')
-    } finally {
-      setLoading(null)
-    }
+      if (res.ok) { showToast(`"${project.name}" saved ✓`); onSaved() }
+      else showToast('Save failed', 'error')
+    } catch { showToast('Connection error', 'error') }
+    finally { setLoading(null) }
   }
 
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-mono text-xs text-[var(--cyan)] uppercase tracking-widest">
-          المشاريع ({projects.length})
+          Projects ({projects.length})
         </h2>
         <button
           onClick={add}
           className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-mono text-[var(--green)] bg-[var(--green-glow)] border border-[rgba(0,255,136,0.2)] hover:bg-[rgba(0,255,136,0.2)] transition-colors"
         >
-          + إضافة مشروع
+          + Add Project
         </button>
       </div>
 
@@ -102,14 +90,13 @@ export function AdminProjects({ projects: initial, showToast, onSaved }: Props) 
             transition={{ duration: 0.2 }}
           >
             <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5 mb-3">
-              {/* Header */}
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2 font-mono text-sm text-[var(--text)]">
                   <span>{project.emoji}</span>
                   <span>{project.name}</span>
                   {project.active && (
                     <span className="text-xs text-[var(--green)] border border-[rgba(0,255,136,0.3)] bg-[var(--green-glow)] px-2 py-0.5 rounded-full">
-                      نشط
+                      active
                     </span>
                   )}
                 </div>
@@ -117,63 +104,37 @@ export function AdminProjects({ projects: initial, showToast, onSaved }: Props) 
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Field label="اسم المشروع">
-                  <Input
-                    value={project.name}
-                    onChange={e => update(project.id, 'name', e.target.value)}
-                  />
+                <Field label="Project Name">
+                  <Input value={project.name} onChange={e => update(project.id, 'name', e.target.value)} />
                 </Field>
-                <Field label="الإيموجي">
-                  <Input
-                    value={project.emoji}
-                    onChange={e => update(project.id, 'emoji', e.target.value)}
-                    className="w-20"
-                  />
+                <Field label="Emoji">
+                  <Input value={project.emoji} onChange={e => update(project.id, 'emoji', e.target.value)} className="w-20" />
                 </Field>
               </div>
 
-              <Field label="الوصف">
-                <Textarea
-                  value={project.description}
-                  onChange={e => update(project.id, 'description', e.target.value)}
-                  rows={2}
-                />
+              <Field label="Description">
+                <Textarea value={project.description} onChange={e => update(project.id, 'description', e.target.value)} rows={2} />
               </Field>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Field label="الرابط">
-                  <Input
-                    value={project.link}
-                    onChange={e => update(project.id, 'link', e.target.value)}
-                    placeholder="https://github.com/..."
-                    dir="ltr"
-                  />
+                <Field label="Link">
+                  <Input value={project.link} onChange={e => update(project.id, 'link', e.target.value)} placeholder="https://github.com/..." />
                 </Field>
-                <Field label="رابط الصورة (اختياري)">
-                  <Input
-                    value={project.image_url || ''}
-                    onChange={e => update(project.id, 'image_url', e.target.value)}
-                    placeholder="https://..."
-                    dir="ltr"
-                  />
+                <Field label="Image URL (optional)">
+                  <Input value={project.image_url || ''} onChange={e => update(project.id, 'image_url', e.target.value)} placeholder="https://..." />
                 </Field>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Field label="Tags (بفاصلة)">
+                <Field label="Tags (comma-separated)">
                   <Input
                     value={(project.tags || []).join(', ')}
                     onChange={e => update(project.id, 'tags', e.target.value.split(',').map(t => t.trim()).filter(Boolean))}
                     placeholder="Node.js, React, Supabase"
                   />
                 </Field>
-                <Field label="الترتيب">
-                  <Input
-                    type="number"
-                    value={project.sort_order}
-                    onChange={e => update(project.id, 'sort_order', parseInt(e.target.value) || 0)}
-                    className="w-24"
-                  />
+                <Field label="Sort Order">
+                  <Input type="number" value={project.sort_order} onChange={e => update(project.id, 'sort_order', parseInt(e.target.value) || 0)} className="w-24" />
                 </Field>
               </div>
 
@@ -181,20 +142,13 @@ export function AdminProjects({ projects: initial, showToast, onSaved }: Props) 
                 <label className="flex items-center gap-3 cursor-pointer">
                   <button
                     onClick={() => update(project.id, 'active', !project.active)}
-                    className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                      project.active ? 'bg-[var(--green)]' : 'bg-[var(--border-2)]'
-                    }`}
+                    className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${project.active ? 'bg-[var(--green)]' : 'bg-[var(--border-2)]'}`}
                   >
                     <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${project.active ? 'translate-x-5' : 'translate-x-1'}`} />
                   </button>
-                  <span className="text-sm text-[var(--text-2)]">نشط (يعرض مؤشر أخضر)</span>
+                  <span className="text-sm text-[var(--text-2)]">Show active indicator (green dot)</span>
                 </label>
-                <SaveBtn
-                  loading={loading === project.id}
-                  onClick={() => save(project)}
-                  label="حفظ"
-                  className="text-xs px-4 py-2"
-                />
+                <SaveBtn loading={loading === project.id} onClick={() => save(project)} label="Save" className="text-xs px-4 py-2" />
               </div>
             </div>
           </motion.div>
@@ -203,7 +157,7 @@ export function AdminProjects({ projects: initial, showToast, onSaved }: Props) 
 
       {projects.length === 0 && (
         <div className="text-center py-12 text-[var(--text-3)] font-mono text-sm">
-          لا توجد مشاريع — اضغط "+ إضافة مشروع"
+          No projects yet — click &quot;+ Add Project&quot;
         </div>
       )}
     </div>

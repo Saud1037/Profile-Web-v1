@@ -39,11 +39,15 @@ export interface SocialLink {
 export interface Profile {
   id: string
   name: string
+  username: string
   role: string
   bio: string
   tags: string[]
   stats: StatItem[]
   available_for_work: boolean
+  avatar_url?: string
+  banner_url?: string
+  banner_color?: string
 }
 
 export interface StatItem {

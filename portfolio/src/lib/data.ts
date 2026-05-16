@@ -1,5 +1,5 @@
 import { supabase, createServiceClient } from './supabase'
-import type { Project, SkillGroup, SocialLink, Profile, SiteData } from '@/types'
+import type { Project, SkillGroup, SocialLink, Profile, SiteData, Skill } from '@/types'
 
 // ─── PUBLIC READ ─────────────────────────────────────────────────────────────
 
@@ -8,10 +8,7 @@ export async function getProfile(): Promise<Profile | null> {
     .from('profile')
     .select('*')
     .single()
-  if (error) {
-    console.error('getProfile error:', error)
-    return getDefaultProfile()
-  }
+  if (error) return getDefaultProfile()
   return data
 }
 
@@ -20,10 +17,7 @@ export async function getProjects(): Promise<Project[]> {
     .from('projects')
     .select('*')
     .order('sort_order', { ascending: true })
-  if (error) {
-    console.error('getProjects error:', error)
-    return getDefaultProjects()
-  }
+  if (error) return getDefaultProjects()
   return data || []
 }
 
@@ -42,7 +36,7 @@ export async function getSkillGroups(): Promise<SkillGroup[]> {
 
   return (groups || []).map(g => ({
     ...g,
-    skills: (skills || []).filter(s => s.group_id === g.id),
+    skills: (skills || []).filter((s: Skill) => s.group_id === g.id),
   }))
 }
 
@@ -70,23 +64,17 @@ export async function getAllSiteData(): Promise<SiteData> {
   }
 }
 
-// ─── ADMIN WRITE (uses service client) ───────────────────────────────────────
+// ─── ADMIN WRITE ──────────────────────────────────────────────────────────────
 
 export async function updateProfile(data: Partial<Profile>): Promise<void> {
   const client = createServiceClient()
-  const { error } = await client
-    .from('profile')
-    .upsert({ id: '1', ...data })
+  const { error } = await client.from('profile').upsert({ id: '1', ...data })
   if (error) throw error
 }
 
 export async function upsertProject(project: Partial<Project> & { id?: string }): Promise<Project> {
   const client = createServiceClient()
-  const { data, error } = await client
-    .from('projects')
-    .upsert(project)
-    .select()
-    .single()
+  const { data, error } = await client.from('projects').upsert(project).select().single()
   if (error) throw error
   return data
 }
@@ -132,22 +120,26 @@ export async function deleteSocialLink(id: string): Promise<void> {
   if (error) throw error
 }
 
-// ─── DEFAULTS (fallback when DB not set up yet) ───────────────────────────────
+// ─── DEFAULTS ────────────────────────────────────────────────────────────────
 
 function getDefaultProfile(): Profile {
   return {
     id: '1',
-    name: 'سعود',
-    role: 'مطور • مبتكر',
-    bio: 'مطور متخصص في بناء تجارب رقمية استثنائية. أجمع بين الكود النظيف والتصميم الجذاب لبناء منتجات تترك أثراً.',
+    name: 'Saud',
+    username: 'saud.dev',
+    role: 'Developer • Innovator',
+    bio: 'A developer specialized in building exceptional digital experiences. I combine clean code with compelling design to ship products that leave an impact.',
     tags: ['JavaScript', 'Node.js', 'Discord.js', 'Supabase', 'React', 'UI/UX'],
     stats: [
-      { key: '3+', value: 'سنوات خبرة' },
-      { key: '20+', value: 'مشروع مكتمل' },
-      { key: '10k+', value: 'سطر كود' },
-      { key: '∞', value: 'شغف ودوافع' },
+      { key: '3+', value: 'Years Exp.' },
+      { key: '20+', value: 'Projects' },
+      { key: '10k+', value: 'Lines of Code' },
+      { key: '∞', value: 'Passion' },
     ],
     available_for_work: true,
+    avatar_url: '',
+    banner_url: '',
+    banner_color: '#0d1f3c',
   }
 }
 
@@ -156,7 +148,7 @@ function getDefaultProjects(): Project[] {
     {
       id: '1',
       name: 'Discord Giveaway Bot',
-      description: 'بوت سحب احترافي بنظام نقاط الحظ، لوحة المتصدرين، وأوامر Slash متكاملة مع Supabase.',
+      description: 'A professional giveaway bot with weighted luck multipliers, leaderboards, and full Slash command support backed by Supabase.',
       tags: ['Node.js', 'Discord.js', 'Supabase'],
       link: '#',
       emoji: '🎉',
@@ -166,7 +158,7 @@ function getDefaultProjects(): Project[] {
     {
       id: '2',
       name: 'Admin Manager Bot',
-      description: 'بوت إدارة متعدد المستويات مع صلاحيات Owner وAdmin ونظام مرونة في إضافة الأدوار.',
+      description: 'A multi-tier Discord admin management bot with Owner/Admin roles, flexible role assignment, and persistent JSON storage.',
       tags: ['Node.js', 'Discord.js', 'JSON'],
       link: '#',
       emoji: '🛡️',
@@ -176,7 +168,7 @@ function getDefaultProjects(): Project[] {
     {
       id: '3',
       name: 'Portfolio Dashboard',
-      description: 'موقع شخصي بتصميم Dashboard مستقبلي مع Terminal تفاعلي ولوحة تحكم Admin.',
+      description: 'A futuristic personal dashboard site with an interactive terminal and a hidden Admin panel for live content editing.',
       tags: ['Next.js', 'Tailwind', 'Supabase'],
       link: '#',
       emoji: '🖥️',
@@ -190,7 +182,7 @@ function getDefaultSkillGroups(): SkillGroup[] {
   return [
     {
       id: 'g1',
-      group_name: 'الواجهة الأمامية',
+      group_name: 'Frontend',
       sort_order: 1,
       skills: [
         { id: 's1', group_id: 'g1', name: 'React / Next.js', percentage: 80, sort_order: 1 },
@@ -200,7 +192,7 @@ function getDefaultSkillGroups(): SkillGroup[] {
     },
     {
       id: 'g2',
-      group_name: 'الخلفية والـ API',
+      group_name: 'Backend & APIs',
       sort_order: 2,
       skills: [
         { id: 's4', group_id: 'g2', name: 'Node.js', percentage: 90, sort_order: 1 },
@@ -210,7 +202,7 @@ function getDefaultSkillGroups(): SkillGroup[] {
     },
     {
       id: 'g3',
-      group_name: 'الأدوات والـ DevOps',
+      group_name: 'DevOps & Tools',
       sort_order: 3,
       skills: [
         { id: 's7', group_id: 'g3', name: 'Git & GitHub', percentage: 85, sort_order: 1 },
@@ -230,6 +222,4 @@ function getDefaultSocialLinks(): SocialLink[] {
   ]
 }
 
-// Re-export type so it can be used without importing from types directly
-import type { Skill } from '@/types'
 export type { Skill }
