@@ -2,22 +2,25 @@ export interface SocialLink {
   id: string;
   title: string;
   url: string;
-  icon: string; // lucide icon name
+  icon: string;
   order: number;
 }
 
 export interface ProfileColors {
-  primary: string;       // e.g. "#6366f1"
-  background: string;    // e.g. "#0f0f1a"
-  cardGlass: string;     // rgba for glassmorphism
+  primary: string;        // لون أيقونات البطاقات والتفاصيل
+  background: string;     // لون خلفية الصفحة
+  gradientFrom: string;   // لون بداية الـ gradient (زاوية علوية يسار)
+  gradientTo: string;     // لون نهاية الـ gradient (زاوية سفلية يمين)
+  gradientAngle: number;  // زاوية الـ gradient بالدرجات (0-360)
+  cardGlass: string;      // شفافية البطاقات
   text: string;
 }
 
 export interface ProfileData {
   name: string;
   bio: string;
-  avatar: string;        // base64 or URL
-  banner: string;        // base64 or URL
+  avatar: string;
+  banner: string;
   colors: ProfileColors;
   links: SocialLink[];
   adminPassword: string;
