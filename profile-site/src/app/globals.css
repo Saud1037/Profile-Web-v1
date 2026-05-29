@@ -3,20 +3,17 @@
 @tailwind utilities;
 
 :root {
-  --profile-primary: #6366f1;
-  --profile-secondary: #a855f7;
-  --profile-bg: #0a0a0f;
-  --profile-glass: rgba(255, 255, 255, 0.04);
-  --profile-text: #ffffff;
+  --profile-primary:    #6366f1;
+  --profile-grad-from:  #6366f1;
+  --profile-grad-to:    #a855f7;
+  --profile-grad-angle: 135deg;
+  --profile-bg:         #0a0a0f;
+  --profile-glass:      rgba(255,255,255,0.04);
+  --profile-text:       #ffffff;
 }
 
-* {
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 
 body {
   background-color: var(--profile-bg);
@@ -25,111 +22,70 @@ body {
   overflow-x: hidden;
 }
 
-/* ── Gradient background mesh ── */
+/* ── Ambient glow mesh ── */
 .profile-bg-mesh {
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
+  overflow: hidden;
 }
-
 .profile-bg-mesh::before {
   content: "";
   position: absolute;
-  top: -30%;
+  top: -25%;
   left: 50%;
   transform: translateX(-50%);
-  width: 80vw;
-  height: 80vw;
-  max-width: 700px;
-  max-height: 700px;
+  width: 90vw;
+  height: 90vw;
+  max-width: 800px;
+  max-height: 800px;
   border-radius: 50%;
-  background: radial-gradient(
-    ellipse at center,
-    var(--profile-primary) 0%,
-    transparent 70%
+  background: radial-gradient(ellipse at center,
+    var(--profile-grad-from) 0%,
+    transparent 65%
   );
-  opacity: 0.12;
-  filter: blur(60px);
+  opacity: 0.1;
+  filter: blur(70px);
 }
-
 .profile-bg-mesh::after {
   content: "";
   position: absolute;
-  bottom: -10%;
-  right: -10%;
-  width: 50vw;
-  height: 50vw;
-  max-width: 400px;
-  max-height: 400px;
+  bottom: -15%;
+  right: -5%;
+  width: 55vw;
+  height: 55vw;
+  max-width: 500px;
+  max-height: 500px;
   border-radius: 50%;
-  background: radial-gradient(
-    ellipse at center,
-    var(--profile-secondary) 0%,
-    transparent 70%
+  background: radial-gradient(ellipse at center,
+    var(--profile-grad-to) 0%,
+    transparent 65%
   );
   opacity: 0.08;
   filter: blur(80px);
 }
 
-/* ── Glassmorphism card ── */
-.glass-card {
-  background: var(--profile-glass);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, border-color 0.25s ease;
-}
-
-.glass-card:hover {
-  transform: translateY(-2px);
-  background: rgba(255, 255, 255, 0.07);
-  border-color: rgba(255, 255, 255, 0.14);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
-}
-
-/* ── Link card gradient border on hover ── */
-.link-card-wrap {
-  position: relative;
-  border-radius: 16px;
-}
-
-.link-card-wrap::before {
-  content: "";
-  position: absolute;
-  inset: -1px;
-  border-radius: 17px;
+/* ── Banner ── */
+.banner-gradient {
   background: linear-gradient(
-    135deg,
-    var(--profile-primary),
-    var(--profile-secondary)
+    var(--profile-grad-angle),
+    var(--profile-grad-from),
+    var(--profile-grad-to)
   );
-  opacity: 0;
-  transition: opacity 0.25s ease;
-  z-index: 0;
 }
 
-.link-card-wrap:hover::before {
-  opacity: 0.5;
-}
-
-.link-card-wrap > a {
-  position: relative;
-  z-index: 1;
-}
-
-/* ── Avatar ring gradient ── */
+/* ── Avatar ring ── */
 .avatar-ring {
   padding: 3px;
   background: linear-gradient(
-    135deg,
-    var(--profile-primary),
-    var(--profile-secondary)
+    var(--profile-grad-angle),
+    var(--profile-grad-from),
+    var(--profile-grad-to)
   );
   border-radius: 50%;
+  display: inline-block;
 }
-
 .avatar-ring-inner {
   border-radius: 50%;
   overflow: hidden;
@@ -137,12 +93,12 @@ body {
   padding: 3px;
 }
 
-/* ── Name gradient text ── */
+/* ── Gradient text ── */
 .gradient-text {
   background: linear-gradient(
-    135deg,
-    var(--profile-primary) 0%,
-    var(--profile-secondary) 100%
+    var(--profile-grad-angle),
+    var(--profile-grad-from) 0%,
+    var(--profile-grad-to) 100%
   );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -158,52 +114,71 @@ body {
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.03em;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.55);
-  transition: background 0.2s ease, color 0.2s ease;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.55);
 }
 
-/* ── Scroll chevron bounce ── */
+/* ── Glass card ── */
+.glass-card {
+  background: var(--profile-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease,
+              background 0.25s ease, border-color 0.25s ease;
+}
+.glass-card:hover {
+  transform: translateY(-2px);
+  background: rgba(255,255,255,0.07);
+  border-color: rgba(255,255,255,0.14);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+}
+
+/* ── Link card gradient border on hover ── */
+.link-card-wrap {
+  position: relative;
+  border-radius: 16px;
+}
+.link-card-wrap::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 17px;
+  background: linear-gradient(
+    var(--profile-grad-angle),
+    var(--profile-grad-from),
+    var(--profile-grad-to)
+  );
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  z-index: 0;
+}
+.link-card-wrap:hover::before { opacity: 0.5; }
+.link-card-wrap > a { position: relative; z-index: 1; }
+
+/* ── Animations ── */
 @keyframes bounce-down {
-  0%, 100% { transform: translateY(0); opacity: 0.4; }
-  50% { transform: translateY(6px); opacity: 0.8; }
+  0%,100% { transform: translateY(0);  opacity: 0.4; }
+  50%      { transform: translateY(6px); opacity: 0.8; }
 }
+.bounce-chevron { animation: bounce-down 1.8s ease-in-out infinite; }
 
-.bounce-chevron {
-  animation: bounce-down 1.8s ease-in-out infinite;
-}
-
-/* ── Fade-in-up animation ── */
 @keyframes fade-up {
   from { opacity: 0; transform: translateY(18px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-
-.fade-up {
-  animation: fade-up 0.6s ease forwards;
-  opacity: 0;
-}
-
-.fade-up-1 { animation-delay: 0.1s; }
-.fade-up-2 { animation-delay: 0.25s; }
-.fade-up-3 { animation-delay: 0.4s; }
-.fade-up-4 { animation-delay: 0.55s; }
+.fade-up { animation: fade-up 0.6s ease forwards; opacity: 0; }
+.fade-up-1 { animation-delay: 0.05s; }
+.fade-up-2 { animation-delay: 0.2s;  }
+.fade-up-3 { animation-delay: 0.35s; }
+.fade-up-4 { animation-delay: 0.5s;  }
+.fade-up-5 { animation-delay: 0.65s; }
 
 /* ── Scrollbar ── */
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 3px;
-}
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
 
-/* ── Focus ring ── */
-*:focus-visible {
-  outline: 2px solid var(--profile-primary);
-  outline-offset: 2px;
-}
-
-.color-transition {
-  transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
-}
+*:focus-visible { outline: 2px solid var(--profile-primary); outline-offset: 2px; }
