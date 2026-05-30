@@ -44,17 +44,18 @@ export default function ProfilePage() {
       <div className="profile-bg-mesh" />
 
       {/* ══ BANNER ══ */}
-      <div className="relative w-full h-52 sm:h-64 overflow-hidden fade-up fade-up-1">
+      <div className="relative w-full overflow-hidden fade-up fade-up-1" style={{ height: "clamp(220px, 40vh, 380px)" }}>
         {profile.banner ? (
-          <Image src={profile.banner} alt="Banner" fill className="object-cover" priority />
+          <Image src={profile.banner} alt="Banner" fill className="object-cover object-center" priority />
         ) : (
           <div className="banner-gradient w-full h-full" />
         )}
-        {/* fade to bg at bottom */}
+        {/* فقط آخر 20% يتلاشى تدريجياً نحو لون الخلفية */}
         <div
-          className="absolute inset-x-0 bottom-0 h-32"
+          className="absolute inset-x-0 bottom-0"
           style={{
-            background: `linear-gradient(to bottom, transparent, ${profile.colors.background})`,
+            height: "22%",
+            background: `linear-gradient(to bottom, transparent 0%, ${profile.colors.background} 100%)`,
           }}
         />
       </div>
